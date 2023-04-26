@@ -1,18 +1,20 @@
+using Microsoft.AspNetCore.Authorization;
+
 public class SubjectApi
 {
     public void Register(WebApplication app)
     {
-        app.MapGet("/subjects", async (ITestingAppRepository repository) =>
+        app.MapGet("/subjects", [Authorize] async (ITestingAppRepository repository) =>
             Results.Ok(await repository.GetSubjectsAsync()))
             .WithTags("Subjects");
 
-        app.MapGet("/subjects/{id}", async (int id, ITestingAppRepository repository) =>
+        app.MapGet("/subjects/{id}", [Authorize] async (int id, ITestingAppRepository repository) =>
             await repository.GetSubjectAsync(id) is Subject subject
             ? Results.Ok(subject)
             : Results.NotFound())
             .WithTags("Subjects");
 
-        app.MapPost("/subjects", async ([FromBody] Subject subject, ITestingAppRepository repository) =>
+        app.MapPost("/subjects", [Authorize] async ([FromBody] Subject subject, ITestingAppRepository repository) =>
         {
             await repository.InsertSubjectAsync(subject);
             await repository.SaveAsync();
@@ -20,7 +22,7 @@ public class SubjectApi
         })
             .WithTags("Subjects");
 
-        app.MapPut("/subjects", async ([FromBody] Subject subject, ITestingAppRepository repository) =>
+        app.MapPut("/subjects", [Authorize] async ([FromBody] Subject subject, ITestingAppRepository repository) =>
         {
             await repository.UpdateSubjectAsync(subject);
             await repository.SaveAsync();
@@ -28,7 +30,7 @@ public class SubjectApi
         })
             .WithTags("Subjects");
 
-        app.MapDelete("/subjects/{id}", async (int id, ITestingAppRepository repository) =>
+        app.MapDelete("/subjects/{id}", [Authorize] async (int id, ITestingAppRepository repository) =>
         {
             await repository.DeleteSubjectAsync(id);
             await repository.SaveAsync();

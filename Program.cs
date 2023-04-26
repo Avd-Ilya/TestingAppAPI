@@ -1,68 +1,35 @@
-var builder = WebApplication.CreateBuilder(args);
+using FluentValidation;
+using Microsoft.OpenApi.Models;
+using TestingAppApi;
+using TestingAppApi.Extensions;
+using TestingAppApi.Users;
 
-RegisterServices(builder.Services);
+var builder = WebApplication.CreateBuilder(args);
+var configuration = builder.Configuration;
+
+builder.Services.AddDatabase();
+builder.Services.AddServices();
+builder.Services.AddValidatorsFromAssemblyContaining(typeof(IAssemblyMarker));
+builder.Services.AddSwagger();
+builder.Services.AddJwt(configuration);
 
 var app = builder.Build();
 
-Configure(app);
-
+new UserApi().Register(app);
 new SchoolClassApi().Register(app);
 new SubjectApi().Register(app);
 new ChapterApi().Register(app);
 new TestApi().Register(app);
 new QuestionApi().Register(app);
 new QuestionTypeApi().Register(app);
+new AnswerOptionApi().Register(app);
+new UserAnswerApi().Register(app);
+new PassedTestApi().Register(app);
+new SelectedOptionApi().Register(app);
 
+app.UseSwaggerApp();
+app.DatabaseEnsureCreated();
+app.UseHttpsRedirection();
+app.UseAuth();
 
 app.Run();
-
-void RegisterServices(IServiceCollection services)
-{
-    services.AddEndpointsApiExplorer();
-    services.AddSwaggerGen();
-
-    // SqlConnectionStringBuilder builderr = new SqlConnectionStringBuilder();
-    // builderr.DataSource = "localhost";
-    // builderr.UserID = "sa";             
-    // builderr.Password = "reallyStrongPwd123";     
-    // builderr.InitialCatalog = "ProductDB";
-
-    services.AddDbContext<TestingAppDb>(options => 
-    {
-        options.UseSqlite(builder.Configuration.GetConnectionString("Sqlite"));
-        //local DB
-        //options.UseSqlServer(builderr.ConnectionString);
-
-        //host Db
-        // options.UseSqlServer(builder.Configuration.GetConnectionString("MSSql"));
-    });
-
-    services.AddScoped<ITestingAppRepository, TestingAppRepository>();
-
-    services.AddCors(options =>
-    {
-        options.AddPolicy("AllowAll", policy =>
-        {
-            policy.AllowAnyHeader();
-            policy.AllowAnyMethod();
-            policy.AllowAnyOrigin();
-        });
-    });
-}
-
-void Configure(WebApplication app)
-{
-    app.UseCors("AllowAll");
-    app.UseSwagger();
-    app.UseSwaggerUI(); 
-
-    if (app.Environment.IsDevelopment())
-    {
-        using var scope = app.Services.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<TestingAppDb>();
-        // db.Database.EnsureDeleted();
-        db.Database.EnsureCreated();
-    }
-
-    app.UseHttpsRedirection();
-}

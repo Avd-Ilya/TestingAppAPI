@@ -1,9 +1,62 @@
+using TestingAppApi.Data;
+using TestingAppApi.Auth;
+using TestingAppApi.Users;
+
 public class TestingAppRepository : ITestingAppRepository
 {
     private readonly TestingAppDb _context;
-    public TestingAppRepository(TestingAppDb context)
+    private readonly IJwtService _jwtService;
+    public TestingAppRepository(TestingAppDb context, IJwtService jwtService)
     {
         _context = context;
+         _jwtService = jwtService;
+    }
+
+    //User
+
+    public async Task<string> Login(User user)
+    {
+        var auth = await _context.Users.FirstOrDefaultAsync(x => x.Username == user.Username);
+        
+        if (auth is null)
+            throw new Exception($"User with username {user.Username} doesn't exists");
+        
+        if (auth.Password != user.Password)
+            throw new Exception($"Wrong password for user {user.Username}");
+
+        return _jwtService.GenerateToken(auth);
+    }
+
+    public async Task<string> Register(User user)
+    {
+        await _context.Users.AddAsync(user);
+        await _context.SaveChangesAsync();
+        return _jwtService.GenerateToken(user);
+    }
+
+    public Task<List<User>> GetUsersAsync() =>
+        _context.Users
+        .ToListAsync();
+
+    public async Task<User> GetUserAsync(String id) =>
+        await _context.Users.FindAsync(new object[]{Guid.Parse(id)});
+
+    public async Task<Boolean> UpdateUserAsync(User user)    
+    {
+        var userFromDb = await _context.Users.FindAsync(new object[]{user.Id});
+        if (userFromDb == null) return false;
+        userFromDb.Fio = user.Fio;
+        userFromDb.Username = user.Username;
+        userFromDb.Password = user.Password;
+        return true;
+    }
+
+    public async Task<Boolean> DeleteUserAsync(String id)
+    {
+        var userFromDb = await _context.Users.FindAsync(new object[]{Guid.Parse(id)});
+        if (userFromDb == null) return false;
+        _context.Users.Remove(userFromDb);
+        return true;
     }
 
     //SchooleClass
@@ -67,6 +120,7 @@ public class TestingAppRepository : ITestingAppRepository
     public Task<List<Chapter>> GetChaptersAsync() =>
         _context.Chapters
         .Include(x => x.Subject)
+        .ThenInclude(x => x.SchoolClass)
         .ToListAsync();
 
     public async Task<Chapter> GetChapterAsync(int id) 
@@ -124,12 +178,14 @@ public class TestingAppRepository : ITestingAppRepository
     public Task<List<Question>> GetQuestionsAsync() =>
         _context.Questions
         .Include(x => x.QuestionType)
+        .Include(x => x.AnswerOptions)
         .ToListAsync();
 
     public async Task<Question> GetQuestionAsync(int id) 
     {
         var question = await _context.Questions
         .Include(x => x.QuestionType)
+        .Include(x => x.AnswerOptions)
         .FirstOrDefaultAsync(h => h.Id == id);
         return question;
     }
@@ -152,24 +208,24 @@ public class TestingAppRepository : ITestingAppRepository
         _context.Questions.Remove(questionFromDb);
     }
 
-    public async Task AddQuestionToTestAsync(int testId, int questionId)
-    {   
-        var test = await _context.Tests.FindAsync(new object[] {testId});
-        var question = await _context.Questions.FindAsync(new object[] {questionId});
-        if (test == null || question == null) return;
-        test.Questions.Add(question);
-    }
+    // public async Task AddQuestionToTestAsync(int testId, int questionId)
+    // {   
+    //     var test = await _context.Tests.FindAsync(new object[] {testId});
+        // var question = await _context.Questions.FindAsync(new object[] {questionId});
+        // if (test == null || question == null) return;
+    //     test.Questions.Add(question);
+    // }
 
-    public async Task DeleteQuestionFromTestAsync(int testId, int questionId)
-    {
-        var question = await _context.Questions.FindAsync(new object[] {questionId});
-        var test = await _context.Tests
-        .Include(x => x.Questions)
-        .FirstOrDefaultAsync(h => h.Id == testId);
+    // public async Task DeleteQuestionFromTestAsync(int testId, int questionId)
+    // {
+    //     var question = await _context.Questions.FindAsync(new object[] {questionId});
+    //     var test = await _context.Tests
+    //     .Include(x => x.Questions)
+    //     .FirstOrDefaultAsync(h => h.Id == testId);
 
-        if (test == null || question == null) return;
-        test.Questions.Remove(question);
-    }
+    //     if (test == null || question == null) return;
+    //     test.Questions.Remove(question);
+    // }
     
     //Test
     public Task<List<Test>> GetTestsAsync() =>
@@ -179,6 +235,8 @@ public class TestingAppRepository : ITestingAppRepository
         .ThenInclude(x => x.SchoolClass)
         .Include(x => x.Questions)
         .ThenInclude(x => x.QuestionType)
+        .Include(x => x.Questions)
+        .ThenInclude(x => x.AnswerOptions)
         .ToListAsync();
 
     public async Task<Test> GetTestAsync(int id) 
@@ -210,8 +268,165 @@ public class TestingAppRepository : ITestingAppRepository
         _context.Tests.Remove(testFromDb);
     }
 
+    //Answer option
+    public Task<List<AnswerOption>> GetAnswerOptionsAsync() =>
+        _context.AnswerOptions
+        .ToListAsync();
 
+    public async Task<AnswerOption> GetAnswerOptionAsync(int id)
+    {
+        var answerOption = await _context.AnswerOptions
+        .FirstOrDefaultAsync(h => h.Id == id);
+        return answerOption;
+    }
 
+    public async Task InsertAnswerOptionAsync(AnswerOption answerOption) =>
+       await _context.AnswerOptions.AddAsync(answerOption);
+
+    public async Task UpdateAnswerOptionAsync(AnswerOption answerOption)
+    {
+        var answerOptionFromDb = await _context.AnswerOptions.FindAsync(new object[]{answerOption.Id});
+        if (answerOptionFromDb == null) return;
+        answerOptionFromDb.Text = answerOption.Text;
+        answerOptionFromDb.IsCorrect = answerOption.IsCorrect;
+        answerOptionFromDb.QuestionId = answerOption.QuestionId;
+        answerOptionFromDb.Position = answerOption.Position;
+        answerOptionFromDb.LeftOptionId = answerOption.LeftOptionId;
+    }
+
+    public async Task DeleteAnswerOptionAsync(int id)
+    {
+        var answerOptionFromDb = await _context.AnswerOptions.FindAsync(new object[]{id});
+        if (answerOptionFromDb == null) return;
+        _context.AnswerOptions.Remove(answerOptionFromDb);
+    }
+
+    //Passed test
+    public Task<List<PassedTest>> GetPassedTestsAsync() =>
+        _context.PassedTests
+        .Include(x => x.UserAnswers)
+        .ThenInclude(x => x.Question)
+        .ThenInclude(x => x.QuestionType)
+        .Include(x => x.UserAnswers)
+        .ThenInclude(x => x.Question)
+        .ThenInclude(x => x.AnswerOptions)
+        .Include(x => x.UserAnswers)
+        .ThenInclude(x => x.SelectedOptions)
+        .ToListAsync();
+
+    public async Task<PassedTest> GetPassedTestAsync(int id)
+    {   
+        var passedTest = await _context.PassedTests
+        .FirstOrDefaultAsync(h => h.Id == id);
+        return passedTest;
+    }
+
+    public async Task InsertPassedTestAsync(PassedTest passedTest) =>
+       await _context.PassedTests.AddAsync(passedTest);
+
+    public async Task UpdatePassedTestAsync(PassedTest passedTest)
+    {
+        var passedTestFromDb = await _context.PassedTests.FindAsync(new object[]{passedTest.Id});
+        if (passedTestFromDb == null) return;
+        passedTestFromDb.Date = passedTest.Date;
+        passedTestFromDb.Result = passedTest.Result;
+        passedTestFromDb.TestId = passedTest.TestId;
+        passedTestFromDb.UserId = passedTest.UserId;
+        passedTestFromDb.UserAnswers = passedTest.UserAnswers;
+    }
+
+    public async Task DeletePassedTestAsync(int id)
+    {
+        var passedTestFromDb = await _context.PassedTests.FindAsync(new object[]{id});
+        if (passedTestFromDb == null) return;
+        _context.PassedTests.Remove(passedTestFromDb);
+    }
+
+    //User answer
+    public Task<List<UserAnswer>> GetUserAnswersAsync() =>
+        _context.UserAnswers
+        .Include(x => x.Question)
+        .ThenInclude(x => x.QuestionType)
+        .Include(x => x.Question)
+        .ThenInclude(x => x.AnswerOptions)
+        .Include(x => x.SelectedOptions)
+        .ThenInclude(x => x.AnswerOtion)
+        .ToListAsync();
+
+    public async Task<UserAnswer> GetUserAnswerAsync(int id)
+    {
+        var userAnswer = await _context.UserAnswers
+        .FirstOrDefaultAsync(h => h.Id == id);
+        return userAnswer;
+    }
+
+    public async Task InsertUserAnswerAsync(UserAnswer userAnswer) 
+    {
+        await _context.UserAnswers.AddAsync(userAnswer);
+        // var options = userAnswer.AnswerOptions;
+        // userAnswer.AnswerOptions.Clear();
+        // Console.Write("test");
+        // Console.Write(options.Count());
+        // await _context.UserAnswers.AddAsync(userAnswer);
+        // foreach (var item in options)
+        // {
+        //     Console.Write(item.Id);
+        //     var option = await _context.AnswerOptions.FindAsync(new object[] {item.Id});
+        //     var userAnswerFromdb = await _context.UserAnswers.FindAsync(new object[] {userAnswer.Id});
+        //     if (option == null || userAnswerFromdb == null) break;
+        //     Console.Write("true");
+        //     userAnswerFromdb.AnswerOptions.Add(option);
+        // }        
+    }
+    public async Task UpdateUserAnswerAsync(UserAnswer userAnswer)
+    {
+        var userAnswerFromDb = await _context.UserAnswers.FindAsync(new object[]{userAnswer.Id});
+        if (userAnswerFromDb == null) return;
+        userAnswerFromDb.QuestionId = userAnswer.QuestionId;
+        userAnswerFromDb.PassedTestId = userAnswer.PassedTestId;
+        // userAnswerFromDb.AnswerOptions.Clear();
+        // userAnswerFromDb.AnswerOptions = userAnswer.AnswerOptions;
+    }
+
+    public async Task DeleteUserAnswerAsync(int id)
+    {
+        var userAnswerFromDb = await _context.UserAnswers.FindAsync(new object[]{id});
+        if (userAnswerFromDb == null) return;
+        _context.UserAnswers.Remove(userAnswerFromDb);
+    }
+
+    //Selected option
+    public Task<List<SelectedOption>> GetSelectedOptionsAsync() =>
+        _context.SelectedOptions
+        .ToListAsync();
+
+    public async Task<SelectedOption> GetSelectedOptionAsync(int id)
+    {
+        var selectedOption = await _context.SelectedOptions
+        .FirstOrDefaultAsync(h => h.Id == id);
+        return selectedOption;
+    }
+
+    public async Task InsertSelectedOptionAsync(SelectedOption selectedOption)
+    {
+        await _context.SelectedOptions.AddAsync(selectedOption);
+    }
+
+    public async Task UpdateSelectedOptionAsync(SelectedOption selectedOption)
+    {
+        var selectedOptionFromDb = await _context.SelectedOptions.FindAsync(new object[]{selectedOption.Id});
+        if (selectedOptionFromDb == null) return;
+        selectedOptionFromDb.Position = selectedOption.Position;
+        selectedOptionFromDb.AnswerOtionId = selectedOption.AnswerOtionId;
+        selectedOptionFromDb.UserAnswerId = selectedOption.UserAnswerId;
+    }
+
+    public async Task DeleteSelectedOptionAsync(int id)
+    {
+        var selectedOptionFromDb = await _context.SelectedOptions.FindAsync(new object[]{id});
+        if (selectedOptionFromDb == null) return;
+        _context.SelectedOptions.Remove(selectedOptionFromDb);
+    }
 
     //Save
     public async Task SaveAsync() => 

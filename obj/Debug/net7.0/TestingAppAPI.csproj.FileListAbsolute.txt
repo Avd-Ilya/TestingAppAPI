@@ -62,3 +62,14 @@
 /Users/Ilya/Dev/TestingAppAPI/bin/Debug/net7.0/Swashbuckle.AspNetCore.SwaggerGen.dll
 /Users/Ilya/Dev/TestingAppAPI/bin/Debug/net7.0/Swashbuckle.AspNetCore.SwaggerUI.dll
 /Users/Ilya/Dev/TestingAppAPI/obj/Debug/net7.0/TestingAppAPI.MvcApplicationPartsAssemblyInfo.cs
+/Users/Ilya/Dev/TestingAppAPI/bin/Debug/net7.0/FluentValidation.dll
+/Users/Ilya/Dev/TestingAppAPI/bin/Debug/net7.0/FluentValidation.DependencyInjectionExtensions.dll
+/Users/Ilya/Dev/TestingAppAPI/bin/Debug/net7.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll
+/Users/Ilya/Dev/TestingAppAPI/bin/Debug/net7.0/Microsoft.AspNetCore.OpenApi.dll
+/Users/Ilya/Dev/TestingAppAPI/bin/Debug/net7.0/Microsoft.IdentityModel.Abstractions.dll
+/Users/Ilya/Dev/TestingAppAPI/bin/Debug/net7.0/Microsoft.IdentityModel.JsonWebTokens.dll
+/Users/Ilya/Dev/TestingAppAPI/bin/Debug/net7.0/Microsoft.IdentityModel.Logging.dll
+/Users/Ilya/Dev/TestingAppAPI/bin/Debug/net7.0/Microsoft.IdentityModel.Protocols.dll
+/Users/Ilya/Dev/TestingAppAPI/bin/Debug/net7.0/Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+/Users/Ilya/Dev/TestingAppAPI/bin/Debug/net7.0/Microsoft.IdentityModel.Tokens.dll
+/Users/Ilya/Dev/TestingAppAPI/bin/Debug/net7.0/System.IdentityModel.Tokens.Jwt.dll

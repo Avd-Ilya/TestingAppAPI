@@ -1,18 +1,20 @@
+using Microsoft.AspNetCore.Authorization;
+
 public class ChapterApi
 {
     public void Register(WebApplication app)
     {
-        app.MapGet("/chapters", async (ITestingAppRepository repository) =>
+        app.MapGet("/chapters", [Authorize] async (ITestingAppRepository repository) =>
             Results.Ok(await repository.GetChaptersAsync()))
             .WithTags("Chapters");
 
-        app.MapGet("/chapters/{id}", async (int id, ITestingAppRepository repository) =>
+        app.MapGet("/chapters/{id}", [Authorize] async (int id, ITestingAppRepository repository) =>
             await repository.GetChapterAsync(id) is Chapter chapter
             ? Results.Ok(chapter)
             : Results.NotFound())
             .WithTags("Chapters");
 
-        app.MapPost("/chapters", async ([FromBody] Chapter chapter, ITestingAppRepository repository) =>
+        app.MapPost("/chapters", [Authorize] async ([FromBody] Chapter chapter, ITestingAppRepository repository) =>
         {
             await repository.InsertChapterAsync(chapter);
             await repository.SaveAsync();
@@ -20,7 +22,7 @@ public class ChapterApi
         })
             .WithTags("Chapters");
 
-        app.MapPut("/chapters", async ([FromBody] Chapter chapter, ITestingAppRepository repository) =>
+        app.MapPut("/chapters", [Authorize] async ([FromBody] Chapter chapter, ITestingAppRepository repository) =>
         {
             await repository.UpdateChapterAsync(chapter);
             await repository.SaveAsync();
@@ -28,7 +30,7 @@ public class ChapterApi
         })
             .WithTags("Chapters");
 
-        app.MapDelete("/chapters/{id}", async (int id, ITestingAppRepository repository) =>
+        app.MapDelete("/chapters/{id}", [Authorize] async (int id, ITestingAppRepository repository) =>
         {
             await repository.DeleteChapterAsync(id);
             await repository.SaveAsync();

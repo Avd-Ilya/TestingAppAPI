@@ -36,20 +36,20 @@ public class QuestionApi
         })
             .WithTags("Questions");
 
-        app.MapPost("/add-question-to-test/{testId}/{questionId}", async (int testId, int questionId, ITestingAppRepository repository) =>
-        {
-            await repository.AddQuestionToTestAsync(testId, questionId);
-            await repository.SaveAsync();
-            return Results.Created($"/tests/{testId}", await repository.GetTestAsync(testId));
-        })
-            .WithTags("Questions");
+        // app.MapPost("/add-question-to-test/{testId}/{questionId}", async (int testId, int questionId, ITestingAppRepository repository) =>
+        // {
+        //     await repository.AddQuestionToTestAsync(testId, questionId);
+        //     await repository.SaveAsync();
+        //     return Results.Created($"/tests/{testId}", await repository.GetTestAsync(testId));
+        // })
+        //     .WithTags("Questions");
         
-        app.MapPost("/delete-question-from-test/{testId}/{questionId}", async (int testId, int questionId, ITestingAppRepository repository) =>
-        {
-            await repository.DeleteQuestionFromTestAsync(testId, questionId);
-            await repository.SaveAsync();
-            return Results.Created($"/tests/{testId}", await repository.GetTestAsync(testId));
-        })
-            .WithTags("Questions");
+        // app.MapPost("/delete-question-from-test/{testId}/{questionId}", async (int testId, int questionId, ITestingAppRepository repository) =>
+        // {
+        //     await repository.DeleteQuestionFromTestAsync(testId, questionId);
+        //     await repository.SaveAsync();
+        //     return Results.Created($"/tests/{testId}", await repository.GetTestAsync(testId));
+        // })
+        //     .WithTags("Questions");
     }
 }
