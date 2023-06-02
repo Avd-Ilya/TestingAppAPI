@@ -8,6 +8,10 @@ public class ChapterApi
             Results.Ok(await repository.GetChaptersAsync()))
             .WithTags("Chapters");
 
+        app.MapGet("/chapters/subject/{id}", [Authorize] async (int id, ITestingAppRepository repository) =>
+            Results.Ok(await repository.GetChaptersBySubjectAsync(id)))
+            .WithTags("Chapters");
+
         app.MapGet("/chapters/{id}", [Authorize] async (int id, ITestingAppRepository repository) =>
             await repository.GetChapterAsync(id) is Chapter chapter
             ? Results.Ok(chapter)

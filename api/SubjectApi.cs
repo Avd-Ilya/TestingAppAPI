@@ -8,6 +8,10 @@ public class SubjectApi
             Results.Ok(await repository.GetSubjectsAsync()))
             .WithTags("Subjects");
 
+        app.MapGet("/subjects/class/{id}", [Authorize] async (int id, ITestingAppRepository repository) =>
+            Results.Ok(await repository.GetSubjectsByClassAsync(id)))
+            .WithTags("Subjects");
+
         app.MapGet("/subjects/{id}", [Authorize] async (int id, ITestingAppRepository repository) =>
             await repository.GetSubjectAsync(id) is Subject subject
             ? Results.Ok(subject)

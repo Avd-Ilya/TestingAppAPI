@@ -1,18 +1,20 @@
+using Microsoft.AspNetCore.Authorization;
+
 public class AnswerOptionApi
 {
     public void Register(WebApplication app)
     {
-        app.MapGet("/answer-options", async (ITestingAppRepository repository) =>
+        app.MapGet("/answer-options", [Authorize] async (ITestingAppRepository repository) =>
             Results.Ok(await repository.GetAnswerOptionsAsync()))
             .WithTags("AnswerOptions");
 
-        app.MapGet("/answer-options/{id}", async (int id, ITestingAppRepository repository) =>
+        app.MapGet("/answer-options/{id}", [Authorize] async (int id, ITestingAppRepository repository) =>
             await repository.GetAnswerOptionAsync(id) is AnswerOption answerOption
             ? Results.Ok(answerOption)
             : Results.NotFound())
             .WithTags("AnswerOptions");
 
-        app.MapPost("/answer-options", async ([FromBody] AnswerOption answerOption, ITestingAppRepository repository) =>
+        app.MapPost("/answer-options", [Authorize] async ([FromBody] AnswerOption answerOption, ITestingAppRepository repository) =>
         {
             await repository.InsertAnswerOptionAsync(answerOption);
             await repository.SaveAsync();
@@ -20,7 +22,7 @@ public class AnswerOptionApi
         })
             .WithTags("AnswerOptions");
 
-        app.MapPut("/answer-options", async ([FromBody] AnswerOption answerOption, ITestingAppRepository repository) =>
+        app.MapPut("/answer-options", [Authorize] async ([FromBody] AnswerOption answerOption, ITestingAppRepository repository) =>
         {
             await repository.UpdateAnswerOptionAsync(answerOption);
             await repository.SaveAsync();
@@ -28,7 +30,7 @@ public class AnswerOptionApi
         })
             .WithTags("AnswerOptions");
 
-        app.MapDelete("/answer-options/{id}", async (int id, ITestingAppRepository repository) =>
+        app.MapDelete("/answer-options/{id}", [Authorize] async (int id, ITestingAppRepository repository) =>
         {
             await repository.DeleteAnswerOptionAsync(id);
             await repository.SaveAsync();

@@ -8,6 +8,7 @@ public interface ITestingAppRepository : IDisposable
     public Task<string> Register(User user);
     Task<List<User>> GetUsersAsync();
     Task<User> GetUserAsync(String id);
+    Task<User> GetUserByEmailAsync(String email);
     Task<Boolean> UpdateUserAsync(User user);
     Task<Boolean> DeleteUserAsync(String id);
 
@@ -21,6 +22,7 @@ public interface ITestingAppRepository : IDisposable
 
     //Subject
     Task<List<Subject>> GetSubjectsAsync();
+    Task<List<Subject>> GetSubjectsByClassAsync(int id);
     Task<Subject> GetSubjectAsync(int id);
     Task InsertSubjectAsync(Subject subject);
     Task UpdateSubjectAsync(Subject subject);
@@ -28,6 +30,7 @@ public interface ITestingAppRepository : IDisposable
 
     //Chapter
     Task<List<Chapter>> GetChaptersAsync();
+    Task<List<Chapter>> GetChaptersBySubjectAsync(int id);
     Task<Chapter> GetChapterAsync(int id);
     Task InsertChapterAsync(Chapter chapter);
     Task UpdateChapterAsync(Chapter chapter);
@@ -51,6 +54,7 @@ public interface ITestingAppRepository : IDisposable
 
     //Test
     Task<List<Test>> GetTestsAsync();
+    Task<List<Test>> GetTestsByChapterAsync(int id);
     Task<Test> GetTestAsync(int id);
     Task InsertTestAsync(Test test);
     Task UpdateTestAsync(Test test);
@@ -65,6 +69,8 @@ public interface ITestingAppRepository : IDisposable
 
     //Passed test
     Task<List<PassedTest>> GetPassedTestsAsync();
+    Task<List<PassedTest>> GetPassedTestsByUserAsync(String id);
+    Task<List<PassedTest>> GetPassedTestsByTrackedTestIdAsync(int id);
     Task<PassedTest> GetPassedTestAsync(int id);
     Task InsertPassedTestAsync(PassedTest passedTest);
     Task UpdatePassedTestAsync(PassedTest passedTest);
@@ -72,6 +78,7 @@ public interface ITestingAppRepository : IDisposable
 
     //User answer
     Task<List<UserAnswer>> GetUserAnswersAsync();
+    Task<List<UserAnswer>> GetUserAnswersByPassedTestAsync(int id);
     Task<UserAnswer> GetUserAnswerAsync(int id);
     Task InsertUserAnswerAsync(UserAnswer userAnswer);
     Task UpdateUserAnswerAsync(UserAnswer userAnswer);
@@ -79,10 +86,20 @@ public interface ITestingAppRepository : IDisposable
 
     //Selected option
     Task<List<SelectedOption>> GetSelectedOptionsAsync();
+    Task<List<SelectedOption>> GetSelectedOptionsByUserAnswerAsync(int id);
     Task<SelectedOption> GetSelectedOptionAsync(int id);
     Task InsertSelectedOptionAsync(SelectedOption selectedOption);
     Task UpdateSelectedOptionAsync(SelectedOption selectedOption);
     Task DeleteSelectedOptionAsync(int id);
+
+    //Tracked test
+    Task<List<TrackedTest>> GetTrackedTestsAsync();
+    Task<List<TrackedTest>> GetTrackedTestsForUserAsync(String id);
+    Task<TrackedTest> GetTrackedTestAsync(int id);
+    Task<TrackedTest?> GetTrackedTestByKeyAsync(String key);
+    Task InsertTrackedTestAsync(TrackedTest trackedTest);
+    Task UpdateTrackedTestAsync(TrackedTest trackedTest);
+    Task DeleteTrackedTestAsync(int id);
 
     Task SaveAsync();
 }

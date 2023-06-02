@@ -26,6 +26,7 @@ new AnswerOptionApi().Register(app);
 new UserAnswerApi().Register(app);
 new PassedTestApi().Register(app);
 new SelectedOptionApi().Register(app);
+new TrackedTestApi().Register(app);
 
 app.UseSwaggerApp();
 app.DatabaseEnsureCreated();

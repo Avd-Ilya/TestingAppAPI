@@ -5,6 +5,7 @@ public class PassedTestRequset {
     }
     public DateTime? Date { get; set; }
     public double? Result { get; set; }
-    public int? TestId { get; set; }   
+    public int? TestId { get; set; }
+    public int? TrackedTestId { get; set; }   
     public ICollection<UserAnswerRequest> UserAnswerRequests { get; set; }
 }

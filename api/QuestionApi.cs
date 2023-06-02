@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Authorization;
+
 public class QuestionApi
 {
     public void Register(WebApplication app)
     {
-        app.MapGet("/questions", async (ITestingAppRepository repository) =>
+        app.MapGet("/questions", [Authorize] async (ITestingAppRepository repository) =>
             Results.Ok(await repository.GetQuestionsAsync()))
             .WithTags("Questions");
 
@@ -12,7 +14,7 @@ public class QuestionApi
             : Results.NotFound())
             .WithTags("Questions");
 
-        app.MapPost("/questions", async ([FromBody] Question question, ITestingAppRepository repository) =>
+        app.MapPost("/questions", [Authorize] async ([FromBody] Question question, ITestingAppRepository repository) =>
         {
             await repository.InsertQuestionAsync(question);
             await repository.SaveAsync();
@@ -20,7 +22,7 @@ public class QuestionApi
         })
             .WithTags("Questions");
 
-        app.MapPut("/questions", async ([FromBody] Question question, ITestingAppRepository repository) =>
+        app.MapPut("/questions", [Authorize] async ([FromBody] Question question, ITestingAppRepository repository) =>
         {
             await repository.UpdateQuestionAsync(question);
             await repository.SaveAsync();
@@ -28,7 +30,7 @@ public class QuestionApi
         })
             .WithTags("Questions");
 
-        app.MapDelete("/questions/{id}", async (int id, ITestingAppRepository repository) =>
+        app.MapDelete("/questions/{id}", [Authorize] async (int id, ITestingAppRepository repository) =>
         {
             await repository.DeleteQuestionAsync(id);
             await repository.SaveAsync();

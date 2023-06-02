@@ -8,6 +8,10 @@ public class TestApi
             Results.Ok(await repository.GetTestsAsync()))
             .WithTags("Tests");
 
+        app.MapGet("/tests/chapter/{id}", [Authorize] async (int id, ITestingAppRepository repository) =>
+            Results.Ok(await repository.GetTestsByChapterAsync(id)))
+            .WithTags("Tests");
+
         app.MapGet("/tests/{id}", [Authorize] async (int id, ITestingAppRepository repository) =>
             await repository.GetTestAsync(id) is Test test
             ? Results.Ok(test)

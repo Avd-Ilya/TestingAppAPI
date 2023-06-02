@@ -19,4 +19,5 @@ public class TestingAppDb: DbContext
     public DbSet<PassedTest> PassedTests => Set<PassedTest>();
     public DbSet<UserAnswer> UserAnswers => Set<UserAnswer>();
     public DbSet<SelectedOption> SelectedOptions => Set<SelectedOption>();
+    public DbSet<TrackedTest> TrackedTests => Set<TrackedTest>();
 }

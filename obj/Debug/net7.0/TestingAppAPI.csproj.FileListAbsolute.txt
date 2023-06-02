@@ -73,3 +73,9 @@
 /Users/Ilya/Dev/TestingAppAPI/bin/Debug/net7.0/Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 /Users/Ilya/Dev/TestingAppAPI/bin/Debug/net7.0/Microsoft.IdentityModel.Tokens.dll
 /Users/Ilya/Dev/TestingAppAPI/bin/Debug/net7.0/System.IdentityModel.Tokens.Jwt.dll
+/Users/Ilya/Dev/TestingAppAPI/bin/Debug/net7.0/Humanizer.dll
+/Users/Ilya/Dev/TestingAppAPI/bin/Debug/net7.0/Microsoft.EntityFrameworkCore.Design.dll
+/Users/Ilya/Dev/TestingAppAPI/bin/Debug/net7.0/dotnet-ef.dll
+/Users/Ilya/Dev/TestingAppAPI/bin/Debug/net7.0/Mono.TextTemplating.dll
+/Users/Ilya/Dev/TestingAppAPI/bin/Debug/net7.0/Newtonsoft.Json.dll
+/Users/Ilya/Dev/TestingAppAPI/bin/Debug/net7.0/System.CodeDom.dll
